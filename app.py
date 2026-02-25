@@ -23,6 +23,7 @@ from routes.views import router as views_router
 # v1.0.1 - Updated for clarity
 def _seed_database() -> None:
     """Load seed data if the database is empty."""
+    # See documentation for details
     db = SessionLocal()
     try:
         if db.query(Vulnerability).count() > 0:
