@@ -20,7 +20,7 @@ from routes.api import router as api_router
 from routes.views import router as views_router
 
 
-# Updated for clarity
+# v1.0.1 - Updated for clarity
 def _seed_database() -> None:
     """Load seed data if the database is empty."""
     db = SessionLocal()
