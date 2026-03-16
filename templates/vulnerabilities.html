@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Vulnerabilities{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-header">
+        <h1 class="glitch-text">Vulnerability Database</h1>
+        <p class="section-sub">Browse, search, and analyze known vulnerabilities</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+        <form method="get" action="/vulnerabilities" class="filter-form">
+            <div class="filter-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" name="search" value="{{ current_search }}"
+                       placeholder="CVE ID, title, or keyword..." class="filter-input">
+            </div>
+            <div class="filter-group">
+                <label for="severity">Severity</label>
+                <select id="severity" name="severity" class="filter-select">
+                    <option value="">All</option>
+                    <option value="CRITICAL" {% if current_severity == 'CRITICAL' %}selected{% endif %}>Critical</option>
+                    <option value="HIGH" {% if current_severity == 'HIGH' %}selected{% endif %}>High</option>
+                    <option value="MEDIUM" {% if current_severity == 'MEDIUM' %}selected{% endif %}>Medium</option>
+                    <option value="LOW" {% if current_severity == 'LOW' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="/vulnerabilities" class="btn btn-ghost">Clear</a>
+        </form>
+    </div>
+
+    <!-- CVSS Calculator -->
+    <div class="panel collapsible">
+        <h3 class="panel-title toggle-panel" data-target="cvss-calc">
+            CVSS v3.1 Calculator <span class="toggle-icon">+</span>
+        </h3>
+        <div id="cvss-calc" class="panel-body collapsed">
+            <div class="cvss-calculator" id="cvss-calculator">
+                <div class="cvss-metrics-grid">
+                    <div class="metric-group">
+                        <label>Attack Vector (AV)</label>
+                        <div class="metric-buttons" data-metric="AV">
+                            <button class="metric-btn active" data-value="N">Network</button>
+                            <button class="metric-btn" data-value="A">Adjacent</button>
+                            <button class="metric-btn" data-value="L">Local</button>
+                            <button class="metric-btn" data-value="P">Physical</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Attack Complexity (AC)</label>
+                        <div class="metric-buttons" data-metric="AC">
+                            <button class="metric-btn active" data-value="L">Low</button>
+                            <button class="metric-btn" data-value="H">High</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Privileges Required (PR)</label>
+                        <div class="metric-buttons" data-metric="PR">
+                            <button class="metric-btn active" data-value="N">None</button>
+                            <button class="metric-btn" data-value="L">Low</button>
+                            <button class="metric-btn" data-value="H">High</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>User Interaction (UI)</label>
+                        <div class="metric-buttons" data-metric="UI">
+                            <button class="metric-btn active" data-value="N">None</button>
+                            <button class="metric-btn" data-value="R">Required</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Scope (S)</label>
+                        <div class="metric-buttons" data-metric="S">
+                            <button class="metric-btn active" data-value="U">Unchanged</button>
+                            <button class="metric-btn" data-value="C">Changed</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Confidentiality (C)</label>
+                        <div class="metric-buttons" data-metric="C">
+                            <button class="metric-btn" data-value="N">None</button>
+                            <button class="metric-btn" data-value="L">Low</button>
+                            <button class="metric-btn active" data-value="H">High</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Integrity (I)</label>
+                        <div class="metric-buttons" data-metric="I">
+                            <button class="metric-btn" data-value="N">None</button>
+                            <button class="metric-btn" data-value="L">Low</button>
+                            <button class="metric-btn active" data-value="H">High</button>
+                        </div>
+                    </div>
+                    <div class="metric-group">
+                        <label>Availability (A)</label>
+                        <div class="metric-buttons" data-metric="A">
+                            <button class="metric-btn" data-value="N">None</button>
+                            <button class="metric-btn" data-value="L">Low</button>
+                            <button class="metric-btn active" data-value="H">High</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="cvss-result">
+                    <div class="cvss-score-display">
+                        <span id="cvss-score">9.8</span>
+                        <span id="cvss-severity" class="severity-badge severity-critical">CRITICAL</span>
+                    </div>
+                    <div class="cvss-vector mono" id="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vulnerability Table -->
+    <div class="panel full-width">
+        <div class="table-header">
+            <h3 class="panel-title">{{ vulnerabilities | length }} Vulnerabilities Found</h3>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>CVE ID</th>
+                        <th>Title</th>
+                        <th>Severity</th>
+                        <th>CVSS</th>
+                        <th>Product</th>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vuln in vulnerabilities %}
+                    <tr class="vuln-row" data-id="{{ vuln.id }}">
+                        <td class="mono">{{ vuln.cve_id }}</td>
+                        <td>{{ vuln.title }}</td>
+                        <td><span class="severity-badge severity-{{ vuln.severity | lower }}">{{ vuln.severity }}</span></td>
+                        <td class="mono cvss-cell">{{ vuln.cvss_score }}</td>
+                        <td>{{ vuln.affected_product or '-' }}</td>
+                        <td>{{ vuln.affected_vendor or '-' }}</td>
+                        <td><span class="status-badge status-{{ vuln.status | lower }}">{{ vuln.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    {% if not vulnerabilities %}
+                    <tr><td colspan="7" class="empty-state">No vulnerabilities match your criteria.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

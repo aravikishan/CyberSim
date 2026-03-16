@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Attack Scenarios{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-header">
+        <h1 class="glitch-text">Attack Scenario Builder</h1>
+        <p class="section-sub">Model threats using the Cyber Kill Chain framework</p>
+    </div>
+
+    <!-- Kill Chain Visualization -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Cyber Kill Chain</h3>
+        <div class="kill-chain-viz" id="kill-chain-viz">
+            {% for stage_info in kill_chain %}
+            <div class="kc-stage" data-stage="{{ stage_info.stage }}">
+                <div class="kc-stage-header">
+                    <span class="kc-number">{{ loop.index }}</span>
+                    <span class="kc-name">{{ stage_info.stage }}</span>
+                </div>
+                <div class="kc-connector"></div>
+                <div class="kc-techniques">
+                    {% for tech in stage_info.techniques %}
+                    <div class="kc-technique" title="{{ tech.description }}">
+                        <span class="tech-id">{{ tech.id }}</span>
+                        <span class="tech-name">{{ tech.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Scenario Builder Form -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Create Scenario</h3>
+        <form id="scenario-form" class="scenario-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sc-name">Scenario Name</label>
+                    <input type="text" id="sc-name" placeholder="e.g., Ransomware via Phishing" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="sc-stage">Kill Chain Stage</label>
+                    <select id="sc-stage" class="form-select">
+                        {% for stage_info in kill_chain %}
+                        <option value="{{ stage_info.stage }}">{{ stage_info.stage }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sc-technique">Technique</label>
+                    <input type="text" id="sc-technique" placeholder="e.g., Spearphishing Attachment" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="sc-mitre">MITRE ATT&CK ID</label>
+                    <input type="text" id="sc-mitre" placeholder="e.g., T1566.001" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="sc-severity">Severity</label>
+                    <select id="sc-severity" class="form-select">
+                        <option value="CRITICAL">Critical</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM" selected>Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sc-likelihood">Likelihood</label>
+                    <select id="sc-likelihood" class="form-select">
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sc-vuln">Linked Vulnerability</label>
+                    <select id="sc-vuln" class="form-select">
+                        <option value="">None</option>
+                        {% for v in vulnerabilities %}
+                        <option value="{{ v.id }}">{{ v.cve_id }} - {{ v.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sc-asset">Target Asset</label>
+                    <select id="sc-asset" class="form-select">
+                        <option value="">None</option>
+                        {% for a in assets %}
+                        <option value="{{ a.id }}">{{ a.name }} ({{ a.asset_type }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sc-actor">Threat Actor</label>
+                    <select id="sc-actor" class="form-select">
+                        <option value="">None</option>
+                        {% for actor in threat_actors %}
+                        <option value="{{ actor.id }}">{{ actor.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label for="sc-desc">Description</label>
+                <textarea id="sc-desc" class="form-textarea" rows="3" placeholder="Describe the attack scenario..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Scenario</button>
+        </form>
+    </div>
+
+    <!-- Attack Simulation -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Attack Simulation</h3>
+        <div class="sim-controls">
+            <div class="form-group">
+                <label>Select Kill Chain Stages</label>
+                <div class="stage-checkboxes" id="sim-stages">
+                    {% for stage_info in kill_chain %}
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="{{ stage_info.stage }}" checked>
+                        <span>{{ stage_info.stage }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="sim-params">
+                <div class="form-group">
+                    <label for="sim-sophistication">Attacker Sophistication</label>
+                    <select id="sim-sophistication" class="form-select">
+                        <option value="Nation-State">Nation-State</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                        <option value="Script Kiddie">Script Kiddie</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sim-criticality">Target Criticality</label>
+                    <select id="sim-criticality" class="form-select">
+                        <option value="Critical">Critical</option>
+                        <option value="High" selected>High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <button id="run-simulation" class="btn btn-danger">Run Simulation</button>
+        </div>
+        <div id="sim-results" class="sim-results hidden"></div>
+    </div>
+
+    <!-- Existing Scenarios Table -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Existing Scenarios ({{ scenarios | length }})</h3>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Kill Chain Stage</th>
+                        <th>Technique</th>
+                        <th>MITRE ID</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sc in scenarios %}
+                    <tr>
+                        <td>{{ sc.name }}</td>
+                        <td><span class="stage-badge">{{ sc.kill_chain_stage }}</span></td>
+                        <td>{{ sc.technique or '-' }}</td>
+                        <td class="mono">{{ sc.mitre_id or '-' }}</td>
+                        <td><span class="severity-badge severity-{{ sc.severity | lower }}">{{ sc.severity }}</span></td>
+                        <td><span class="status-badge status-{{ sc.status | lower }}">{{ sc.status }}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-ghost delete-scenario" data-id="{{ sc.id }}">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not scenarios %}
+                    <tr><td colspan="7" class="empty-state">No scenarios created yet.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

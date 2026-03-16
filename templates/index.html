@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="section-header">
+        <h1 class="glitch-text">Security Dashboard</h1>
+        <p class="section-sub">Real-time threat landscape overview</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card kpi-critical">
+            <div class="kpi-value">{{ severity_counts.get('CRITICAL', 0) }}</div>
+            <div class="kpi-label">Critical</div>
+            <div class="kpi-bar critical-bar"></div>
+        </div>
+        <div class="kpi-card kpi-high">
+            <div class="kpi-value">{{ severity_counts.get('HIGH', 0) }}</div>
+            <div class="kpi-label">High</div>
+            <div class="kpi-bar high-bar"></div>
+        </div>
+        <div class="kpi-card kpi-medium">
+            <div class="kpi-value">{{ severity_counts.get('MEDIUM', 0) }}</div>
+            <div class="kpi-label">Medium</div>
+            <div class="kpi-bar medium-bar"></div>
+        </div>
+        <div class="kpi-card kpi-low">
+            <div class="kpi-value">{{ severity_counts.get('LOW', 0) }}</div>
+            <div class="kpi-label">Low</div>
+            <div class="kpi-bar low-bar"></div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">&#9888;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_vulns }}</div>
+                <div class="stat-label">Vulnerabilities</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#9760;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_scenarios }}</div>
+                <div class="stat-label">Attack Scenarios</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#9881;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_assets }}</div>
+                <div class="stat-label">Assets Tracked</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#128565;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_actors }}</div>
+                <div class="stat-label">Threat Actors</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">&#127919;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ avg_cvss }}</div>
+                <div class="stat-label">Avg CVSS Score</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Severity Chart -->
+        <div class="panel">
+            <h3 class="panel-title">Vulnerability Severity Distribution</h3>
+            <div id="severity-chart" class="chart-container"
+                 data-critical="{{ severity_counts.get('CRITICAL', 0) }}"
+                 data-high="{{ severity_counts.get('HIGH', 0) }}"
+                 data-medium="{{ severity_counts.get('MEDIUM', 0) }}"
+                 data-low="{{ severity_counts.get('LOW', 0) }}">
+            </div>
+        </div>
+
+        <!-- Top Risky Assets -->
+        <div class="panel">
+            <h3 class="panel-title">Top Risky Assets</h3>
+            <div class="asset-risk-list">
+                {% for asset in top_assets %}
+                <div class="risk-item">
+                    <div class="risk-info">
+                        <span class="risk-name">{{ asset.name }}</span>
+                        <span class="risk-badge badge-{{ asset.criticality | lower }}">{{ asset.criticality }}</span>
+                    </div>
+                    <div class="risk-bar-container">
+                        <div class="risk-bar-fill" style="width: {{ asset.risk_score }}%"></div>
+                        <span class="risk-score-label">{{ asset.risk_score }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not top_assets %}
+                <p class="empty-state">No assets tracked yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Vulnerabilities -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Recent Vulnerabilities</h3>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>CVE ID</th>
+                        <th>Title</th>
+                        <th>Severity</th>
+                        <th>CVSS</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vuln in recent_vulns %}
+                    <tr>
+                        <td class="mono">{{ vuln.cve_id }}</td>
+                        <td>{{ vuln.title }}</td>
+                        <td><span class="severity-badge severity-{{ vuln.severity | lower }}">{{ vuln.severity }}</span></td>
+                        <td class="mono cvss-cell">{{ vuln.cvss_score }}</td>
+                        <td><span class="status-badge status-{{ vuln.status | lower }}">{{ vuln.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    {% if not recent_vulns %}
+                    <tr><td colspan="5" class="empty-state">No vulnerabilities recorded.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

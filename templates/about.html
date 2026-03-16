@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<section class="page-section about-page">
+    <div class="section-header">
+        <h1 class="glitch-text">About CyberSim</h1>
+        <p class="section-sub">Cybersecurity Attack Scenario Simulator v1.0</p>
+    </div>
+
+    <div class="about-grid">
+        <div class="panel">
+            <h3 class="panel-title">What is CyberSim?</h3>
+            <p>CyberSim is a comprehensive cybersecurity simulation platform designed
+            for security professionals, red teamers, and educators. It provides tools
+            to model attack scenarios, calculate vulnerability severity scores, and
+            assess organizational risk posture.</p>
+        </div>
+
+        <div class="panel">
+            <h3 class="panel-title">Key Features</h3>
+            <ul class="feature-list">
+                <li><span class="feature-icon">&#9632;</span> CVSS v3.1 Base Score Calculator with full metric support</li>
+                <li><span class="feature-icon">&#9632;</span> Cyber Kill Chain visualization and attack scenario builder</li>
+                <li><span class="feature-icon">&#9632;</span> Vulnerability database with CVE-style entries</li>
+                <li><span class="feature-icon">&#9632;</span> Asset inventory with automated risk scoring</li>
+                <li><span class="feature-icon">&#9632;</span> Threat actor profiles and tracking</li>
+                <li><span class="feature-icon">&#9632;</span> Attack simulation engine with mitigation recommendations</li>
+                <li><span class="feature-icon">&#9632;</span> RESTful API for automation and integration</li>
+                <li><span class="feature-icon">&#9632;</span> Interactive security dashboard with real-time metrics</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h3 class="panel-title">Technology Stack</h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <span class="tech-label">Backend</span>
+                    <span class="tech-value">FastAPI + Python 3.11</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-label">Database</span>
+                    <span class="tech-value">SQLite + SQLAlchemy 2.0</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-label">Templates</span>
+                    <span class="tech-value">Jinja2</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-label">API Docs</span>
+                    <span class="tech-value">Swagger UI (built-in)</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-label">Validation</span>
+                    <span class="tech-value">Pydantic v2</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-label">Container</span>
+                    <span class="tech-value">Docker</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3 class="panel-title">Standards & Frameworks</h3>
+            <ul class="feature-list">
+                <li><span class="feature-icon">&#9632;</span> CVSS v3.1 (Common Vulnerability Scoring System)</li>
+                <li><span class="feature-icon">&#9632;</span> Lockheed Martin Cyber Kill Chain</li>
+                <li><span class="feature-icon">&#9632;</span> MITRE ATT&CK Framework technique references</li>
+                <li><span class="feature-icon">&#9632;</span> CVE (Common Vulnerabilities and Exposures) format</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel full-width">
+        <h3 class="panel-title">API Documentation</h3>
+        <p>CyberSim exposes a full REST API. Visit <a href="/docs" class="link">/docs</a>
+        for the interactive Swagger UI or <a href="/redoc" class="link">/redoc</a>
+        for the ReDoc documentation.</p>
+        <div class="api-endpoints">
+            <div class="endpoint"><span class="method get">GET</span> <code>/api/dashboard</code> Dashboard statistics</div>
+            <div class="endpoint"><span class="method get">GET</span> <code>/api/vulnerabilities</code> List vulnerabilities</div>
+            <div class="endpoint"><span class="method post">POST</span> <code>/api/vulnerabilities</code> Create vulnerability</div>
+            <div class="endpoint"><span class="method get">GET</span> <code>/api/scenarios</code> List attack scenarios</div>
+            <div class="endpoint"><span class="method post">POST</span> <code>/api/scenarios</code> Create scenario</div>
+            <div class="endpoint"><span class="method get">GET</span> <code>/api/assets</code> List assets</div>
+            <div class="endpoint"><span class="method post">POST</span> <code>/api/assets</code> Register asset</div>
+            <div class="endpoint"><span class="method post">POST</span> <code>/api/cvss/calculate</code> CVSS calculator</div>
+            <div class="endpoint"><span class="method get">GET</span> <code>/api/kill-chain</code> Kill chain stages</div>
+            <div class="endpoint"><span class="method post">POST</span> <code>/api/simulate</code> Run simulation</div>
+        </div>
+    </div>
+</section>
+{% endblock %}

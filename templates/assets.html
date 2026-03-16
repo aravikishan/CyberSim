@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Asset Inventory{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-header">
+        <h1 class="glitch-text">Asset Inventory</h1>
+        <p class="section-sub">Track and assess risk across all organizational assets</p>
+    </div>
+
+    <!-- Add Asset Form -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Register Asset</h3>
+        <form id="asset-form" class="asset-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="asset-name">Asset Name</label>
+                    <input type="text" id="asset-name" class="form-input" placeholder="e.g., Web Server 01" required>
+                </div>
+                <div class="form-group">
+                    <label for="asset-type">Type</label>
+                    <select id="asset-type" class="form-select">
+                        <option value="Server">Server</option>
+                        <option value="Workstation">Workstation</option>
+                        <option value="Network Device">Network Device</option>
+                        <option value="Database">Database</option>
+                        <option value="Application">Application</option>
+                        <option value="IoT Device">IoT Device</option>
+                        <option value="Cloud Service">Cloud Service</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="asset-ip">IP Address</label>
+                    <input type="text" id="asset-ip" class="form-input" placeholder="e.g., 10.0.1.50">
+                </div>
+                <div class="form-group">
+                    <label for="asset-hostname">Hostname</label>
+                    <input type="text" id="asset-hostname" class="form-input" placeholder="e.g., web01.corp.local">
+                </div>
+                <div class="form-group">
+                    <label for="asset-os">OS / Platform</label>
+                    <input type="text" id="asset-os" class="form-input" placeholder="e.g., Ubuntu 22.04 LTS">
+                </div>
+                <div class="form-group">
+                    <label for="asset-env">Environment</label>
+                    <select id="asset-env" class="form-select">
+                        <option value="Production">Production</option>
+                        <option value="Staging">Staging</option>
+                        <option value="Development">Development</option>
+                        <option value="DMZ">DMZ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="asset-owner">Owner</label>
+                    <input type="text" id="asset-owner" class="form-input" placeholder="e.g., Engineering Team">
+                </div>
+                <div class="form-group">
+                    <label for="asset-criticality">Criticality</label>
+                    <select id="asset-criticality" class="form-select">
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Register Asset</button>
+        </form>
+    </div>
+
+    <!-- Asset Table -->
+    <div class="panel full-width">
+        <h3 class="panel-title">Registered Assets ({{ assets | length }})</h3>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>IP Address</th>
+                        <th>Hostname</th>
+                        <th>Environment</th>
+                        <th>Criticality</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr>
+                        <td>{{ asset.name }}</td>
+                        <td>{{ asset.asset_type }}</td>
+                        <td class="mono">{{ asset.ip_address or '-' }}</td>
+                        <td class="mono">{{ asset.hostname or '-' }}</td>
+                        <td>{{ asset.environment }}</td>
+                        <td><span class="risk-badge badge-{{ asset.criticality | lower }}">{{ asset.criticality }}</span></td>
+                        <td>
+                            <div class="risk-score-cell">
+                                <div class="mini-bar">
+                                    <div class="mini-bar-fill" style="width: {{ asset.risk_score }}%"></div>
+                                </div>
+                                <span class="mono">{{ asset.risk_score }}</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-{{ asset.status | lower }}">{{ asset.status }}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-ghost delete-asset" data-id="{{ asset.id }}">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not assets %}
+                    <tr><td colspan="9" class="empty-state">No assets registered.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
