@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  cybersim:
+    build: .
+    container_name: cybersim
+    ports:
+      - "8002:8002"
+    environment:
+      - CYBERSIM_PORT=8002
+      - CYBERSIM_DEBUG=false
+    volumes:
+      - cybersim_data:/app/instance
+    restart: unless-stopped
+
+volumes:
+  cybersim_data:
